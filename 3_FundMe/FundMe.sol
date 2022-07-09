@@ -7,7 +7,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.7;
 
-import "./PriceConverter.sol";
+import "./PriceConverter.sol"; 
+
+error NotOwner();
 
 contract FundMe {
     /* Funziona solo con le funzioni che ricevono un marametro.
@@ -17,21 +19,23 @@ contract FundMe {
     */
     using PriceConverter for uint256;
 
-    uint constant minUsd = 50 * 1e18;
+    uint constant MIN_USD = 50 * 1e18;
 
     address[] public founders;
     mapping(address => uint256) public addressToAmountFounded;
 
-    address public owner;
+    address immutable public i_owner; // Rende immutabile il valore dopo la prima assegnazione
+    // immutable e costant rendono più efficiente la lettura dei valori delle variabili e ciò
+    // permette di minimizzare il gas da utilizzare
 
     constructor(){
-        owner = msg.sender;
+        i_owner = msg.sender;
     }
 
     function fund() public payable {
         // require controlla se la condizione è verificata e fa procedere il flusso,
         // altrimenti lancia un errore ed esegue un revert (ritorna il gas non utilizzato).
-        require(msg.value.getConversionRate() >= minUsd, "Not enougth");
+        require(msg.value.getConversionRate() >= MIN_USD, "Not enougth");
         // msg è una variabile speciale
         // msg.value (uint): number of wei sent with the message
         // msg.sender (address): sender of the message (current call)
@@ -60,7 +64,8 @@ contract FundMe {
 
     modifier onlyOwner(){
         // _; // Se messo prima lo fa prima, e si può mettere anche più volte?
-        require(msg.sender == owner, "Not Alowed!");
+        // require(msg.sender == i_owner, "Not Alowed!");
+        if(msg.sender != i_owner) revert NotOwner(); // revert spende meno gas di require
         _; // Fa il resto del codice
     }
 }
