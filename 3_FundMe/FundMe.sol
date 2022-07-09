@@ -68,4 +68,12 @@ contract FundMe {
         if(msg.sender != i_owner) revert NotOwner(); // revert spende meno gas di require
         _; // Fa il resto del codice
     }
+
+    receive() external payable {
+        fund();
+    }
+
+    fallback() external payable {
+        fund();
+    }
 }
