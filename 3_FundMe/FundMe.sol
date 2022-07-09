@@ -40,7 +40,7 @@ contract FundMe {
         // msg.value (uint): number of wei sent with the message
         // msg.sender (address): sender of the message (current call)
         founders.push(msg.sender);
-        addressToAmountFounded[msg.sender] = msg.value;
+        addressToAmountFounded[msg.sender] += msg.value;
     }
 
     function withdraw() public onlyOwner {
