@@ -8,7 +8,7 @@ contract FallbackExample {
      * receive e fallback sono due funzioni speciali come constructor che
      * vengono triggerate quando qualcuno prova ad interagire con lo smart
      * contract direttamente senza passare dalla funzioni messe a disposizione
-    */
+     */
 
     receive() external payable {
         result = 1;
@@ -18,8 +18,6 @@ contract FallbackExample {
         result = 2;
     }
 }
-
-
 
 // Which function is called, fallback() or receive()?
 //
