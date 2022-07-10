@@ -7,7 +7,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.7;
 
-import "./PriceConverter.sol"; 
+import "./PriceConverter.sol";
 
 error NotOwner();
 
@@ -16,7 +16,7 @@ contract FundMe {
      * msg.value.getVersion(); // Error
      * In caso di parametri multipli vengono inseriti nella chiamata a partire dal secondo
      * msg.value.someFunction(secondParam, thirdParam);
-    */
+     */
     using PriceConverter for uint256;
 
     uint constant MIN_USD = 50 * 1e18;
@@ -24,11 +24,12 @@ contract FundMe {
     address[] public founders;
     mapping(address => uint256) public addressToAmountFounded;
 
-    address immutable public i_owner; // Rende immutabile il valore dopo la prima assegnazione
+    address public immutable i_owner; // Rende immutabile il valore dopo la prima assegnazione
+
     // immutable e costant rendono più efficiente la lettura dei valori delle variabili e ciò
     // permette di minimizzare il gas da utilizzare
 
-    constructor(){
+    constructor() {
         i_owner = msg.sender;
     }
 
@@ -45,7 +46,7 @@ contract FundMe {
 
     function withdraw() public onlyOwner {
         // Resetto la mappa e l'array di sostenitori
-        for(uint i = 0; i<founders.length; i++){
+        for (uint i = 0; i < founders.length; i++) {
             addressToAmountFounded[founders[i]] = 0;
         }
         founders = new address[](0);
@@ -58,14 +59,17 @@ contract FundMe {
         // require(payable(msg.sender).send(address(this).balance), "Call Failed!"); //  2300 gas, returns bool
 
         // Methodo consigliato
-        (bool callSuccess, /* lowerLevelFunctionReturns */) = payable(msg.sender).call{value: address(this).balance}("");
+        (
+            bool callSuccess, /* lowerLevelFunctionReturns */
+
+        ) = payable(msg.sender).call{value: address(this).balance}("");
         require(callSuccess, "Call Failed!");
     }
 
-    modifier onlyOwner(){
+    modifier onlyOwner() {
         // _; // Se messo prima lo fa prima, e si può mettere anche più volte?
         // require(msg.sender == i_owner, "Not Alowed!");
-        if(msg.sender != i_owner) revert NotOwner(); // revert spende meno gas di require
+        if (msg.sender != i_owner) revert NotOwner(); // revert spende meno gas di require
         _; // Fa il resto del codice
     }
 
