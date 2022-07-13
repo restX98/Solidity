@@ -8,7 +8,7 @@ contract SimpleStorage {
         myNumber = _myNumber;
     }
 
-    function retrive() public view returns(uint256){
+    function retrieve() public view returns(uint256){
         return myNumber;
     }
     function pureFunction() public pure returns(uint256){
