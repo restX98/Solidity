@@ -1,15 +1,19 @@
 const ethers = require("ethers");
 const fs = require("fs-extra");
+require("dotenv").config();
 
 async function main() {
   // Connessione alla blockchain locale creata con Ganache
-  const provider = new ethers.providers.JsonRpcProvider(
-    "http://172.27.160.1:7545"
+  const provider = new ethers.providers.JsonRpcProvider(process.env.RPC_URL);
+
+  const encryencryptedJSONKey = fs.readFileSync("./.encryptedKey.json");
+  // const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+
+  let wallet = new ethers.Wallet.fromEncryptedJsonSync(
+    encryencryptedJSONKey,
+    process.env.PRIVATE_KEY_PASSWORD
   );
-  const wallet = new ethers.Wallet(
-    "26bcdae668ff12ba5a72dc2cfc9a49beb9b8b57c0cca2c1519e6f5636b5bc728",
-    provider
-  );
+  wallet = await wallet.connect(provider);
 
   const abi = fs.readFileSync("./SimpleStorage_sol_SimpleStorage.abi", "utf8");
   const binary = fs.readFileSync(
