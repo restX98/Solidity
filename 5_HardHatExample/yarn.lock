@@ -613,22 +613,22 @@
   resolved "https://registry.yarnpkg.com/@truffle/error/-/error-0.1.0.tgz#5e9fed79e6cda624c926d314b280a576f8b22a36"
   integrity sha512-RbUfp5VreNhsa2Q4YbBjz18rOQI909pG32bghl1hulO7IpvcqTS+C3Ge5cNbiWQ1WGzy1wIeKLW0tmQtHFB7qg==
 
-"@truffle/interface-adapter@^0.5.18":
-  version "0.5.18"
-  resolved "https://registry.yarnpkg.com/@truffle/interface-adapter/-/interface-adapter-0.5.18.tgz#fe7cc32495e156bf78cdd41e6a86c5e0b09572d2"
-  integrity sha512-OPrz7bf+TDjZGruXzm6d08SpFNGERctf4O9uC6IJjNmjvKtdEYcLY3DTXOZT6I9PmrViCJ+dC5VlZD5IaamQnQ==
+"@truffle/interface-adapter@^0.5.19":
+  version "0.5.19"
+  resolved "https://registry.yarnpkg.com/@truffle/interface-adapter/-/interface-adapter-0.5.19.tgz#57529cacb09c72ebfd584ec003af55face18a3de"
+  integrity sha512-x7IZvsyx36DAJCJVZ9gUe1Lh8AhODhJoW7I+lJXIlGxj3EmZbao4/sHo+cN4u9i94yVTyGwYd78NzbP0a/LAog==
   dependencies:
     bn.js "^5.1.3"
     ethers "^4.0.32"
     web3 "1.7.4"
 
 "@truffle/provider@^0.2.24":
-  version "0.2.56"
-  resolved "https://registry.yarnpkg.com/@truffle/provider/-/provider-0.2.56.tgz#437d66f24d21eb144565d7135e570c79fb666b84"
-  integrity sha512-9mz03psTeWkL45IrF3NUTiKO46HUi+9Lkco3rVjqzUQ+5rAhld0TwOljKbLvVKbDFtHl5LVuC+H4uQP8fpoXSg==
+  version "0.2.57"
+  resolved "https://registry.yarnpkg.com/@truffle/provider/-/provider-0.2.57.tgz#c6d079748c99427c1ce283a19921b450aa9920ee"
+  integrity sha512-O8VxF2uQwa+KB4HDg9lG7uhQ/+AOvchX+1STpQBSSAGfov1+EROM0iRZUNoPm71Pu0C9ji2WmXbNW/COjUMaMA==
   dependencies:
     "@truffle/error" "^0.1.0"
-    "@truffle/interface-adapter" "^0.5.18"
+    "@truffle/interface-adapter" "^0.5.19"
     debug "^4.3.1"
     web3 "1.7.4"
 
