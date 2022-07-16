@@ -1,5 +1,6 @@
 require("@nomicfoundation/hardhat-toolbox");
 require("dotenv").config();
+require("./tasks/block-number");
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -35,6 +36,14 @@ module.exports = {
       url: RINKEBY_RPC_URL,
       accounts: [PRIVATE_KEY],
       chainId: 4,
+    },
+    // La HardHat Network crea automaticamente un nodo che verrà stoppato al termine dello script
+    // o del task, è possibile però creare un nodo tramite il nomando "npx|yarn hardhat node" e
+    // specificare la nuova rete locale creata da hardhat:
+    localhost: {
+      url: "http://127.0.0.1:8545/",
+      // accounts: Viene fornito direttamente da hardhat
+      chainId: 31337,
     },
   },
   solidity: "0.8.7",
