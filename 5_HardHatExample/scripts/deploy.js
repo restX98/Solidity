@@ -1,29 +1,50 @@
-// We require the Hardhat Runtime Environment explicitly here. This is optional
-// but useful for running the script in a standalone fashion through `node <script>`.
-//
-// You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
-// will compile your contracts, add the Hardhat Runtime Environment's members to the
-// global scope, and execute the script.
-const hre = require("hardhat");
+const { ethers, run, network } = require("hardhat");
+require("@nomiclabs/hardhat-etherscan");
+require("dotenv").config();
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+  const SimpleStorageFactory = await ethers.getContractFactory("SimpleStorage");
 
-  const lockedAmount = hre.ethers.utils.parseEther("1");
+  console.log("Deploying contract...");
+  const simpleStorage = await SimpleStorageFactory.deploy();
+  await simpleStorage.deployed();
 
-  const Lock = await hre.ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  console.log("Contract:", simpleStorage.address);
 
-  await lock.deployed();
-
-  console.log("Lock with 1 ETH deployed to:", lock.address);
+  // network contiene tutte le informazioni della rete a cui si è connessi
+  if (network.config.chainId === 4 && process.env.ETHERSCAN_API_KEY) {
+    await simpleStorage.deployTransaction.wait(6);
+    await verify(simpleStorage.address, []);
+  }
 }
 
-// We recommend this pattern to be able to use async/await everywhere
-// and properly handle errors.
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+/**
+ * E' possibile verificare programmaticamente il contratto appena deployato tramite
+ * varie API servite dai vari scanner.
+ * HardHat permette di installare dei plugin ed esiste quello di ether-scan
+ * Il plugin ci permette di avere un nuovo task verify.
+ * E' possibile lanciare un task tramite la funzione run(task).
+ */
+async function verify(contractAddress, args) {
+  try {
+    console.log("Verifying Contract...");
+    let result = await run("verify:verify", {
+      address: contractAddress,
+      constructorArguments: args,
+    });
+    console.log(result);
+  } catch (ex) {
+    if (ex.message.toLowerCase().includes("already verified")) {
+      console.log("Already Verified!");
+    } else {
+      console.error(ex);
+    }
+  }
+}
+
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
