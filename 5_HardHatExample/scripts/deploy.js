@@ -16,6 +16,12 @@ async function main() {
     await simpleStorage.deployTransaction.wait(6);
     await verify(simpleStorage.address, []);
   }
+
+  let myNumber = await simpleStorage.retrieve();
+  console.log(`My number: ${myNumber}`); // toString automatico
+  await simpleStorage.store(10);
+  myNumber = await simpleStorage.retrieve();
+  console.log("My updated number:", myNumber.toString());
 }
 
 /**
