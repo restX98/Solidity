@@ -9,6 +9,7 @@
 pragma solidity 0.8.9;
 
 import "./PriceConverter.sol";
+import "hardhat/console.sol";
 
 error FundMe__NotOwner();
 
@@ -67,6 +68,10 @@ contract FundMe {
     }
 
     function withdraw() public onlyOwner {
+        console.log(
+            "E' possibile scrivere i console log direttamente negli smart contract",
+            "Poi saranno visibili lanciando yarn hardhat test"
+        );
         for (uint i = 0; i < funders.length; i++) {
             addressToAmountFounded[funders[i]] = 0;
         }
