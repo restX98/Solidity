@@ -14,7 +14,7 @@ describe("FundMe", async function () {
 
   describe("constructor", async function () {
     it("Sets the aggregator addresses correctly", async function () {
-      const response = await fundMe.priceFeed();
+      const response = await fundMe.getPriceFeed();
       assert.equal(response, mockV3Aggregator.address);
     });
   });
@@ -25,18 +25,21 @@ describe("FundMe", async function () {
       // funzione richiede una quantità minima di eth da mandare
       // Il nostro test sarà proprio questo e dobbiamo verificare che la
       // funzione fund sia stata revertata
-      await expect(fundMe.fund()).to.be.revertedWith("Not enougth");
+      await expect(fundMe.fund()).to.be.revertedWithCustomError(
+        fundMe,
+        "FundMe__NotEnough"
+      );
     });
 
     it("Update the amount of data structure", async function () {
       await fundMe.fund({ value: sendValue });
-      const response = await fundMe.addressToAmountFounded(deployer);
+      const response = await fundMe.getAddressToAmountFounded(deployer);
       assert.equal(response.toString(), sendValue);
     });
 
     it("Adds funder to array of funders", async function () {
       await fundMe.fund({ value: sendValue });
-      const funder = await fundMe.funders(0);
+      const funder = await fundMe.getFunder(0);
       assert.equal(funder, deployer);
     });
   });
@@ -115,10 +118,10 @@ describe("FundMe", async function () {
 
       // Controlliamo se l'arrei di funders è stato resettato.
       // Per farlo verifichiamo se viene sollevata un'eccezione.
-      await expect(fundMe.funders(0)).to.reverted;
+      await expect(fundMe.getFunder(0)).to.reverted;
       for (i = 1; i < 6; i++) {
         assert.equal(
-          await fundMe.addressToAmountFounded(accounts[i].address),
+          await fundMe.getAddressToAmountFounded(accounts[i].address),
           0
         );
       }
@@ -133,6 +136,83 @@ describe("FundMe", async function () {
       ).to.be.revertedWithCustomError(fundMe, "FundMe__NotOwner"); // Non funziona altrimenti!
       attacker.sendTransaction;
     });
+
+    it("Cheaper Withdraw from a single founder", async function () {
+      // Arrange: Conserviamo i dati iniziali prima dell'esecuzione della funzione withdraw
+      const startingFundMeBalance = await fundMe.provider.getBalance(
+        // Potremmo utilizzare anche ethers.provider.getBalance
+        fundMe.address
+      );
+      const startingDeployerBalance = await fundMe.provider.getBalance(
+        deployer
+      );
+      // Act: Runniamo la funzione withdraw dello Smart Contract
+      const transactionResponse = await fundMe.cheaperWithdraw();
+      const transactionReceipt = await transactionResponse.wait(1);
+
+      // gasUsed: Quantità di gas utilizzata
+      // effectiveGasPrice: Prezzo per unità di gas
+      const { gasUsed, effectiveGasPrice } = transactionReceipt;
+      gasCost = gasUsed.mul(effectiveGasPrice);
+      const endingFundMeBalance = await fundMe.provider.getBalance(
+        fundMe.address
+      );
+      const endingDeployerBalance = await fundMe.provider.getBalance(deployer);
+
+      // Assert: Verifichiamo i valori
+      assert.equal(endingFundMeBalance, 0);
+      assert.equal(
+        startingDeployerBalance.add(startingFundMeBalance).toString(),
+        endingDeployerBalance.add(gasCost).toString()
+        // Aggiungiamo il costo del gas speso al bilancio finale del deployer,
+        // potremmo anche sottrarlo all bilancio iniziale più il bilancio dello Smart Contract
+      );
+    });
+
+    it("Cheaper Withdraw from a multiple founder", async function () {
+      // Arrange
+      const accounts = await ethers.getSigners();
+      // Partiamo dal secondo elemento, il primo è il deployer
+      for (let i = 1; i < 6; i++) {
+        // L'istanza fundMe è so il contratto ma è connesso all'account deployer
+        // per eseguire fund() da un'altro indirizzo dobbiamo connetterci ad esso.
+        let fundMeConnected = await fundMe.connect(accounts[i]);
+        await fundMeConnected.fund({ value: sendValue });
+      }
+      const startingFundMeBalance = await fundMe.provider.getBalance(
+        fundMe.address
+      );
+      const startingDeployerBalance = await fundMe.provider.getBalance(
+        deployer
+      );
+
+      // Act
+      const transactionResponse = await fundMe.cheaperWithdraw();
+      const transactionReceipt = await transactionResponse.wait(1);
+
+      const { gasUsed, effectiveGasPrice } = transactionReceipt;
+      gasCost = gasUsed.mul(effectiveGasPrice);
+      const endingFundMeBalance = await fundMe.provider.getBalance(
+        fundMe.address
+      );
+      const endingDeployerBalance = await fundMe.provider.getBalance(deployer);
+
+      assert.equal(endingFundMeBalance, 0);
+      assert.equal(
+        startingDeployerBalance.add(startingFundMeBalance).toString(),
+        endingDeployerBalance.add(gasCost).toString()
+      );
+
+      // Controlliamo se l'arrei di funders è stato resettato.
+      // Per farlo verifichiamo se viene sollevata un'eccezione.
+      await expect(fundMe.getFunder(0)).to.reverted;
+      for (i = 1; i < 6; i++) {
+        assert.equal(
+          await fundMe.getAddressToAmountFounded(accounts[i].address),
+          0
+        );
+      }
+    });
   });
 
   describe("receive", async function () {
@@ -143,7 +223,7 @@ describe("FundMe", async function () {
     it("receive:Fails if you don't send enough ETH", async function () {
       await expect(
         owner.sendTransaction({ to: fundMe.address })
-      ).to.be.revertedWith("Not enougth");
+      ).to.be.revertedWithCustomError(fundMe, "FundMe__NotEnough");
     });
 
     it("receive:Update the amount of data structure", async function () {
@@ -151,7 +231,7 @@ describe("FundMe", async function () {
         to: fundMe.address,
         value: sendValue,
       });
-      const response = await fundMe.addressToAmountFounded(owner.address);
+      const response = await fundMe.getAddressToAmountFounded(owner.address);
       assert.equal(response.toString(), sendValue);
     });
 
@@ -160,7 +240,7 @@ describe("FundMe", async function () {
         to: fundMe.address,
         value: sendValue,
       });
-      const funder = await fundMe.funders(0);
+      const funder = await fundMe.getFunder(0);
       assert.equal(funder, owner.address);
     });
   });
