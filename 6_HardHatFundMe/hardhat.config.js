@@ -36,8 +36,6 @@ module.exports = {
     token: "ETH",
   },
   etherscan: {
-    apiKey: {
-      rinkeby: ETHERSCAN_API_KEY,
-    },
+    apiKey: ETHERSCAN_API_KEY,
   },
 };
