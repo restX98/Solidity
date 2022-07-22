@@ -19,6 +19,7 @@ module.exports = {
       accounts: [PRIVATE_KEY],
       chainId: 4,
       blockConfirmation: 1,
+      //deploy: ["examples-deploy/"], // Ename for try the examples
     },
   },
   namedAccounts: {
