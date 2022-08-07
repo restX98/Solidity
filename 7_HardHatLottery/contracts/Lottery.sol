@@ -49,7 +49,7 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatible {
     uint256 private s_lastTimeStamp;
 
     /* Events */
-    event PartecipateToLottery(address indexed players);
+    event ParticipateToLottery(address indexed players);
     event RequestedLotteryWinner(uint256 indexed requestId);
     event WinnerPicked(address indexed winner);
 
@@ -73,11 +73,11 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatible {
         s_lastTimeStamp = block.timestamp;
     }
 
-    function partecipateToLottery() public payable {
+    function participateToLottery() public payable {
         if (msg.value < i_entranceFee) revert Lottery__NotEnough();
         if (s_lotteryState != LotteryState.OPEN) revert Lottery__Closed();
         s_players.push(payable(msg.sender));
-        emit PartecipateToLottery(msg.sender);
+        emit ParticipateToLottery(msg.sender);
     }
 
     /**
@@ -169,6 +169,10 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatible {
 
     function getLotteryState() public view returns (LotteryState) {
         return s_lotteryState;
+    }
+
+    function getInterval() public view returns (uint256) {
+        return i_interval;
     }
 
     function getVRFCoordinator()

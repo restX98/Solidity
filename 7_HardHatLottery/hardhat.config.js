@@ -37,4 +37,10 @@ module.exports = {
       default: 1,
     },
   },
+  gasReporter: {
+    enabled: false,
+  },
+  mocha: {
+    timeout: 300000, // I test andranno in timeout se persistono per più di 300 secondi
+  },
 };
