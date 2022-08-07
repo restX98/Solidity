@@ -22,7 +22,7 @@ describe("Lottery Unit Tests", function () {
     interval = await lottery.getInterval();
   });
 
-  describe("contructor", function () {
+  describe("constructor", function () {
     it("Init the Lottery correctly", async function () {
       const lotteryState = await lottery.getLotteryState();
       const interval = await lottery.getInterval();
@@ -47,7 +47,7 @@ describe("Lottery Unit Tests", function () {
       assert.equal(deployer, playerFromContract);
     });
 
-    it("Dont allow to partecipate when lottery is closed", async function () {
+    it("Dont allow to participate when lottery is closed", async function () {
       await lottery.participateToLottery({ value: entranceFee });
     });
 
