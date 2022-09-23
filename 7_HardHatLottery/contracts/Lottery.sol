@@ -124,7 +124,7 @@ contract Lottery is VRFConsumerBaseV2, KeeperCompatible {
      *  @dev Funzione chiamata tramite Chainlink Keepers
      */
     function performUpkeep(
-        bytes calldata /* performData */
+        bytes calldata performData
     ) external override {
         (bool upkeepNeeded, ) = checkUpkeep("");
         if (!upkeepNeeded)

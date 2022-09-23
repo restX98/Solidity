@@ -11,6 +11,8 @@ const DEPLOYING_FOLDER = process.env.EXAMPLE
   : ["deploy/"];
 const RINKEBY_RPC_URL = process.env.RINKEBY_RPC_URL;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
+const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY;
+const COINMARKETCAP_API_KEY = process.env.COINMARKETCAP_API_KEY;
 
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
@@ -38,7 +40,15 @@ module.exports = {
     },
   },
   gasReporter: {
-    enabled: false,
+    enabled: true,
+    noColors: true,
+    coinmarketcap: COINMARKETCAP_API_KEY,
+  },
+  etherscan: {
+    apiKey: {
+      rinkeby: ETHERSCAN_API_KEY,
+      kovan: ETHERSCAN_API_KEY,
+    },
   },
   mocha: {
     timeout: 300000, // I test andranno in timeout se persistono per più di 300 secondi
